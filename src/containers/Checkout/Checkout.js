@@ -1,30 +1,11 @@
 import React, { Component } from "react";
+import { connect } from "react-redux";
+import { Redirect, Route } from "react-router-dom";
 import { CheckoutSummary } from "../../components/Order/CheckoutSummary/CheckoutSummary";
+//import Spinner from "../../components/UI/Spinner/Spinner";
+import ContactData from "./ContactData/ContactData";
 
-export default class Checkout extends Component {
-  state = {
-    ingredients: {
-      bacon: 1,
-      salad: 1,
-      meat: 1,
-      cheese: 1,
-    },
-  };
-
-  componentDidMount() {
-    const query = new URLSearchParams(this.props.location.search);
-    const ingredients = {};
-    for(let param of query.entries()) {
-      console.log("param" + param);
-      // [salad, 2]
-      ingredients[param[0]] = +param[1];
-    };
-    console.log("ingrdients: " + ingredients);
-    this.setState({
-      ingredients: ingredients
-    });
-  }
-
+class Checkout extends Component {
   checkoutContinuedHandler = () => {
     this.props.history.replace("/checkout/contact-data");
   };
@@ -34,14 +15,40 @@ export default class Checkout extends Component {
   };
 
   render() {
-    return (
+    const purchaseRedirect = this.props.purchased ? <Redirect to="/" /> : null;
+    let summary = !this.props.ings ? (
+      // <Spinner />
+      <Redirect to="/" />
+    ) : (
       <div>
+        {purchaseRedirect}
         <CheckoutSummary
-          ingredients={this.state.ingredients}
+          ingredients={this.props.ings}
           checkoutContinued={this.checkoutContinuedHandler}
           checkoutCancelled={this.checkoutCancelledHandler}
         />
+        <Route
+          path={this.props.match.path + "/contact-data"}
+          render={() => (
+            <ContactData
+              ingredients={this.props.ings}
+              totalPrice={this.props.price}
+              {...this.props}
+            />
+          )}
+        />
       </div>
     );
+    return summary;
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    ings: state.burgerBuilder.ingredients,
+    price: state.burgerBuilder.totalPrice,
+    purchased: state.order.purchased,
+  };
+};
+
+export default connect(mapStateToProps)(Checkout);
