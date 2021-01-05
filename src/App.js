@@ -13,8 +13,8 @@ class App extends React.Component {
       <div>
         <Layout>
           <Switch>
-            <Route path="/checkout" component={Checkout} />
             <Route path="/orders" component={Orders} />
+            <Route path="/checkout" component={Checkout} />
             <Route path="/" exact component={BurgerBuilder} />
             {/* <Route path="/checkout/contact-data" exact component={ContactData} /> */}
           </Switch>
