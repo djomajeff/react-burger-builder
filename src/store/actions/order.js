@@ -16,19 +16,18 @@ export const purchaseIngredientSucces = (id, orderData) => {
   };
 };
 
-export const purchaseIngrdientStart = () => {
+export const purchaseIngredientStart = () => {
   return {
     type: actionTypes.PURCHASE_INGREDIENT_START,
   };
 };
 
-export const purchaseIngredient = (orderData) => {
+export const purchaseIngredient = (orderData, token) => {
   return (dispatch) => {
-    dispatch(purchaseIngrdientStart());
+    dispatch(purchaseIngredientStart());
     axios
-      .post("/orders.json", orderData)
+      .post("/orders.json?auth=" + token, orderData)
       .then((response) => {
-        console.log(response.data);
         dispatch(purchaseIngredientSucces(response.data.name, orderData));
       })
       .catch((error) => {
@@ -43,31 +42,33 @@ export const purchaseInit = () => {
   };
 };
 
-export const fetchOrderStart = () => {
+export const fetchOrdersStart = () => {
   return {
-    type: actionTypes.FETCH_ORDER_START,
+    type: actionTypes.FETCH_ORDERS_START,
   };
 };
 
-export const fetchOrderFailed = (error) => {
+export const fetchOrdersFailed = (error) => {
   return {
-    type: actionTypes.FETCH_ORDER_FAILED,
+    type: actionTypes.FETCH_ORDERS_FAILED,
     error,
   };
 };
 
-export const fetchOrderSuccess = (orders) => {
+export const fetchOrdersSuccess = (orders) => {
   return {
-    type: actionTypes.FETCH_ORDER_SUCCESS,
+    type: actionTypes.FETCH_ORDERS_SUCCESS,
     orders,
   };
 };
 
-export const fetchOrder = () => {
+export const fetchOrders = (token, userId) => {
   return (dispatch) => {
-    dispatch(fetchOrderStart());
+    dispatch(fetchOrdersStart());
+    const queryParams =
+      `?auth=${token}&orderBy="userId"&equalTo="` + userId + `"`;
     axios
-      .get("/orders.json")
+      .get("/orders.json" + queryParams)
       .then((res) => {
         const fetchedOrders = [];
         for (let key in res.data) {
@@ -76,11 +77,10 @@ export const fetchOrder = () => {
             id: key,
           });
         }
-        console.log(fetchedOrders);
-        dispatch(fetchOrderSuccess(fetchedOrders));
+        dispatch(fetchOrdersSuccess(fetchedOrders));
       })
       .catch((error) => {
-        dispatch(fetchOrderFailed(error));
+        dispatch(fetchOrdersFailed(error));
       });
   };
 };

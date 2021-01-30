@@ -4,7 +4,6 @@ import BurgerIngredients from "./BurgerIngredients/BurgerIngredients";
 import { withRouter } from "react-router-dom";
 
 const burger = (props) => {
-  console.log(props);
   let transformedIngredients = Object.keys(props.ingredients)
     .map((ingKey) => {
       return [...Array(props.ingredients[ingKey])].map((_, i) => {
